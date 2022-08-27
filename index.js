@@ -4,6 +4,7 @@ const clearButton = document.querySelector(".clear");
 const eraserButton = document.querySelector(".eraser");
 const equalButton = document.querySelector(".equal");
 const input = document.querySelector("#display");
+const plusMinusButton = document.querySelector(".plusMinus");
 //  first input
 const firstInputArray = [];
 let firstInputString = "";
@@ -33,7 +34,12 @@ const multiply = (num1, num2) => {
 const divide = (num1, num2) => {
     return num1 / num2;
 };
-
+const modulo = (num1, num2) => {
+    return num1 % num2;
+};
+const plusMinus = (num) => {
+    return num * (-1);
+};
 const operate = (operator, num1, num2) => {
     return operator(num1, num2);
 };
@@ -84,80 +90,109 @@ eraserButton.addEventListener("click", () => {
     }
 });
 
-const choosingOperator = () => {
-    operatorButtons.forEach((button) => {
-        button.addEventListener("click", (e) => {
-            operatorArray.push(e.target.textContent);
 
-            // if result does exist
-            if (result !== 0) {
-                firstInputString = `${result}`;
-                secondInputArray.pop();
+const operatorGenerator = (e) => {
+    //// console.log(result, firstInputString, secondInputString);
+    operatorArray.splice(0, operatorArray.length);
+    operatorArray.push(e.target.textContent);
+
+    // if result does exist
+    if (result !== 0) {
+        firstInputString = `${result}`;
+        result = 0;
+    }
+    input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
+
+    // if firstInputString and secondInputString does exist
+    if (firstInputString !== '' && secondInputString !== '') {
+        //// console.log(result, firstInputString, secondInputString);
+        equalButton.click();
+        e.target.click();
+    }
+}
+
+
+operatorButtons.forEach((button) => {
+    button.addEventListener("click", operatorGenerator);
+});
+
+
+const launchingCalculation = () => {
+    switch (operatorArray[0]) {
+        case "*":
+            result = operate(multiply, firstInputNumber, secondInputNumber);
+            input.value = result;
+            break;
+
+        case "+":
+            result = operate(add, firstInputNumber, secondInputNumber);
+            input.value = result;
+            break;
+        case "-":
+            result = operate(subtract, firstInputNumber, secondInputNumber);
+            input.value = result;
+            break;
+        case "/":
+            if (secondInputNumber === 0) {
+                input.value = 'Error';
             }
-            input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
-        });
-    });
-};
-
-const calculate = () => {
-    equalButton.addEventListener("click", (e) => {
-        firstInputNumber = Number(firstInputString);
-        secondInputNumber = Number(secondInputString);
-        switch (operatorArray[0]) {
-            case "*":
-                result = operate(multiply, firstInputNumber, secondInputNumber);
-                input.value = result;
-                break;
-
-            case "+":
-                result = operate(add, firstInputNumber, secondInputNumber);
-                input.value = result;
-                break;
-            case "-":
-                result = operate(subtract, firstInputNumber, secondInputNumber);
-                input.value = result;
-                break;
-            case "/":
+            else {
+                secondInputNumber = secondInputNumber;
                 result = operate(divide, firstInputNumber, secondInputNumber);
                 input.value = result;
-                break;
-            default:
-                break;
-        }
-        firstInputArray.splice(0, firstInputArray.length);
-        secondInputArray.splice(0, secondInputArray.length);
-        operatorArray.splice(0, operatorArray.length);
-        firstInputString = "";
-        secondInputString = "";
-    });
-};
-
-const writingNumbers = () => {
-    numberButtons.forEach((button) => {
-        button.addEventListener("click", (e) => {
-            if (
-                operatorArray.includes("*") ||
-                operatorArray.includes("/") ||
-                operatorArray.includes("-") ||
-                operatorArray.includes("+")
-            ) {
-                secondInputArray.push(e.target.textContent);
-                secondInputString = secondInputArray.join().replace(/[,]/g, "");
-                input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
-            } else {
-                firstInputArray.push(e.target.textContent);
-                firstInputString = firstInputArray.join().replace(/[,]/g, "");
-                input.value = firstInputString;
             }
-        });
+            break;
+        case "%":
+            result = operate(modulo, firstInputNumber, secondInputNumber);
+            input.value = result;
+            break;
+        default: break;
+    }
+}
+const calculate = () => {
+    firstInputNumber = Number(firstInputString);
+    secondInputNumber = Number(secondInputString);
+    launchingCalculation();
+    firstInputArray.splice(0, firstInputArray.length);
+    secondInputArray.splice(0, secondInputArray.length);
+    operatorArray.splice(0, operatorArray.length);
+    firstInputString = "";
+    secondInputString = "";
+}
+equalButton.addEventListener("click", calculate);
+
+
+numberButtons.forEach((button) => {
+    button.addEventListener("click", (e) => {
+        if (result !== 0) result = 0;
+        if (
+            operatorArray.includes("*") ||
+            operatorArray.includes("/") ||
+            operatorArray.includes("-") ||
+            operatorArray.includes("+") ||
+            operatorArray.includes("%")
+        ) {
+            secondInputArray.push(e.target.textContent);
+            secondInputString = secondInputArray.join().replace(/[,]/g, "");
+            input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
+        } else {
+            firstInputArray.push(e.target.textContent);
+            firstInputString = firstInputArray.join().replace(/[,]/g, "");
+            input.value = firstInputString;
+        }
     });
-    choosingOperator();
-    calculate();
-};
-writingNumbers();
+});
+
+
+plusMinusButton.addEventListener("click", () => {
+    // input.value = input.value * -1;
+    result = operate(plusMinus, input.value);
+    input.value = result;
+});
 
 // fix +/- button
 // fix modulo button
-// fix dot button
 // make it capable for multiple calculations in a row
 // dividing on 0 error display
+//TODOS fix dot button
+//TODOS Style it with bootstrap
