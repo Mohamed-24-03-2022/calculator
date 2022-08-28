@@ -5,6 +5,8 @@ const eraserButton = document.querySelector(".eraser");
 const equalButton = document.querySelector(".equal");
 const input = document.querySelector("#display");
 const plusMinusButton = document.querySelector(".plusMinus");
+const dotButton = document.querySelector(".dot");
+const allButtons = document.querySelectorAll("button");
 //  first input
 const firstInputArray = [];
 let firstInputString = "";
@@ -20,25 +22,27 @@ let result = 0;
 let resultString = "";
 
 const add = (num1, num2) => {
-    return num1 + num2;
+    result = num1 + num2;
+    return Math.round((result + Number.EPSILON) * 100) / 100;
 };
-
 const subtract = (num1, num2) => {
-    return num1 - num2;
+    result = num1 - num2;
+    return Math.round((result + Number.EPSILON) * 100) / 100;
 };
-
 const multiply = (num1, num2) => {
-    return num1 * num2;
+    result = num1 * num2;
+    return Math.round((result + Number.EPSILON) * 100) / 100;
 };
-
 const divide = (num1, num2) => {
-    return num1 / num2;
+    result = num1 / num2;
+    return Math.round((result + Number.EPSILON) * 100) / 100;
 };
 const modulo = (num1, num2) => {
     return num1 % num2;
 };
 const plusMinus = (num) => {
-    return num * (-1);
+    result = num * -1;
+    return Math.round((result + Number.EPSILON) * 100) / 100;
 };
 const operate = (operator, num1, num2) => {
     return operator(num1, num2);
@@ -56,6 +60,7 @@ clearButton.addEventListener("click", () => {
     secondInputString = "";
     result = 0;
     input.value = 0;
+    dotButton.disabled = false;
 });
 
 eraserButton.addEventListener("click", () => {
@@ -88,37 +93,44 @@ eraserButton.addEventListener("click", () => {
         input.value = "0";
         operatorArray.splice(0, operatorArray.length);
     }
+    if (!firstInputString.includes(".") || !secondInputString.includes(".")) {
+        dotButton.disabled = false;
+    }
 });
 
-
 const operatorGenerator = (e) => {
-    //// console.log(result, firstInputString, secondInputString);
-    operatorArray.splice(0, operatorArray.length);
     operatorArray.push(e.target.textContent);
 
-    // if result does exist
+    if (
+        firstInputString !== "" &&
+        operatorArray[0] !== "" &&
+        secondInputString === ""
+    ) {
+        operatorArray.splice(0, operatorArray.length);
+        operatorArray.push(e.target.textContent);
+    }
+    if (firstInputString === "") {
+        firstInputString = secondInputString;
+    }
     if (result !== 0) {
         firstInputString = `${result}`;
         result = 0;
     }
-    input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
 
-    // if firstInputString and secondInputString does exist
-    if (firstInputString !== '' && secondInputString !== '') {
-        //// console.log(result, firstInputString, secondInputString);
-        equalButton.click();
+    if (firstInputString !== "" && secondInputString !== "") {
+        calculate();
         e.target.click();
     }
-}
-
+    input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
+    dotButton.disabled = false;
+};
 
 operatorButtons.forEach((button) => {
     button.addEventListener("click", operatorGenerator);
 });
 
-
-const launchingCalculation = () => {
-    switch (operatorArray[0]) {
+const launchingCalculation = (opIndex) => {
+    switch (opIndex) {
         case "*":
             result = operate(multiply, firstInputNumber, secondInputNumber);
             input.value = result;
@@ -134,9 +146,8 @@ const launchingCalculation = () => {
             break;
         case "/":
             if (secondInputNumber === 0) {
-                input.value = 'Error';
-            }
-            else {
+                input.value = "Error";
+            } else {
                 secondInputNumber = secondInputNumber;
                 result = operate(divide, firstInputNumber, secondInputNumber);
                 input.value = result;
@@ -146,53 +157,100 @@ const launchingCalculation = () => {
             result = operate(modulo, firstInputNumber, secondInputNumber);
             input.value = result;
             break;
-        default: break;
+        default:
+            (input.value = firstInputNumber), secondInputNumber;
+            break;
     }
-}
+};
 const calculate = () => {
+    if (secondInputString === "") return;
     firstInputNumber = Number(firstInputString);
     secondInputNumber = Number(secondInputString);
-    launchingCalculation();
+    launchingCalculation(operatorArray[0]);
     firstInputArray.splice(0, firstInputArray.length);
     secondInputArray.splice(0, secondInputArray.length);
     operatorArray.splice(0, operatorArray.length);
     firstInputString = "";
     secondInputString = "";
-}
+    dotButton.disabled = false;
+};
 equalButton.addEventListener("click", calculate);
 
-
+const disableDotButton = (inputString) => {
+    if (inputString.includes(".")) {
+        dotButton.disabled = true;
+    } else if (!inputString.includes(".")) {
+        dotButton.disabled = false;
+    }
+};
+const writingNumbers = (e) => {
+    if (result !== 0) result = 0;
+    if (
+        operatorArray.includes("*") ||
+        operatorArray.includes("/") ||
+        operatorArray.includes("-") ||
+        operatorArray.includes("+") ||
+        operatorArray.includes("%")
+    ) {
+        console.log("its me " + e.target.textContent);
+        secondInputArray.push(e.target.textContent);
+        secondInputString = secondInputArray.join().replace(/[,]/g, "");
+        disableDotButton(secondInputString);
+        input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
+    } else {
+        firstInputArray.push(e.target.textContent);
+        firstInputString = firstInputArray.join().replace(/[,]/g, "");
+        disableDotButton(firstInputString);
+        input.value = firstInputString;
+    }
+};
 numberButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-        if (result !== 0) result = 0;
-        if (
-            operatorArray.includes("*") ||
-            operatorArray.includes("/") ||
-            operatorArray.includes("-") ||
-            operatorArray.includes("+") ||
-            operatorArray.includes("%")
-        ) {
-            secondInputArray.push(e.target.textContent);
-            secondInputString = secondInputArray.join().replace(/[,]/g, "");
-            input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
-        } else {
-            firstInputArray.push(e.target.textContent);
-            firstInputString = firstInputArray.join().replace(/[,]/g, "");
-            input.value = firstInputString;
-        }
-    });
+    button.addEventListener("click", writingNumbers);
 });
-
 
 plusMinusButton.addEventListener("click", () => {
     // input.value = input.value * -1;
-    result = operate(plusMinus, input.value);
-    input.value = result;
+    if (input.value !== "") {
+        if (secondInputString !== "" || operatorArray[0]) {
+            secondInputString = operate(plusMinus, secondInputString);
+            input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
+        } else {
+            result = operate(plusMinus, input.value);
+            input.value = result;
+        }
+    }
 });
+
+const pressButton = (e) => {
+    e.preventDefault();
+    numberButtons.forEach((button) => {
+        if (e.key === button.textContent) {
+            button.click();
+        }
+    });
+    operatorButtons.forEach((button) => {
+        if (e.key === button.textContent) {
+            button.click();
+            button.click();
+        }
+    });
+    if (e.key === "Enter") {
+        equalButton.click();
+    } else if (e.key === "Backspace") {
+        eraserButton.click();
+    }
+    if (result !== 0) input.value = result;
+    allButtons.forEach((button) => {
+        button.blur();
+    });
+};
+window.addEventListener("keyup", pressButton);
 
 // fix +/- button
 // fix modulo button
 // make it capable for multiple calculations in a row
 // dividing on 0 error display
-//TODOS fix dot button
+// fix multi operational
+// fix dot button
 //TODOS Style it with bootstrap
+// keyboard support
