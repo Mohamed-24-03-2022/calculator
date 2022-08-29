@@ -192,7 +192,6 @@ const writingNumbers = (e) => {
         operatorArray.includes("+") ||
         operatorArray.includes("%")
     ) {
-        console.log("its me " + e.target.textContent);
         secondInputArray.push(e.target.textContent);
         secondInputString = secondInputArray.join().replace(/[,]/g, "");
         disableDotButton(secondInputString);
@@ -212,32 +211,37 @@ plusMinusButton.addEventListener("click", () => {
     // input.value = input.value * -1;
     if (input.value !== "") {
         if (secondInputString !== "" || operatorArray[0]) {
-            secondInputString = operate(plusMinus, secondInputString);
+            secondInputString = operate(plusMinus, secondInputString).toString();
             input.value = `${firstInputString} ${operatorArray[0]} ${secondInputString}`;
         } else {
             result = operate(plusMinus, input.value);
             input.value = result;
         }
+        result = 0;
     }
 });
 
 const pressButton = (e) => {
-    e.preventDefault();
     numberButtons.forEach((button) => {
         if (e.key === button.textContent) {
             button.click();
+            button.classList.add("button-keydown");
         }
     });
     operatorButtons.forEach((button) => {
         if (e.key === button.textContent) {
             button.click();
+            button.classList.add("button-keydown");
             button.click();
+
         }
     });
     if (e.key === "Enter") {
         equalButton.click();
+        equalButton.classList.add("equal-keydown");
     } else if (e.key === "Backspace") {
         eraserButton.click();
+        eraserButton.classList.add("button-keydown");
     }
     if (result !== 0) input.value = result;
     allButtons.forEach((button) => {
@@ -245,12 +249,10 @@ const pressButton = (e) => {
     });
 };
 window.addEventListener("keyup", pressButton);
-
-// fix +/- button
-// fix modulo button
-// make it capable for multiple calculations in a row
-// dividing on 0 error display
-// fix multi operational
-// fix dot button
-//TODOS Style it with bootstrap
-// keyboard support
+// to remove the css classes after clicking in the button
+allButtons.forEach(button => {
+    button.addEventListener("transitionend", (e) => {
+        e.target.classList.remove("button-keydown");
+        e.target.classList.remove("equal-keydown");
+    });
+});

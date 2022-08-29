@@ -4,7 +4,6 @@
   margin: 0;
   box-sizing: border-box;
 }
-
 body {
   font-family: "Roboto", sans-serif;
   display: flex;
@@ -13,57 +12,96 @@ body {
   padding-top: 50px;
   height: 100vh;
 }
-
 .container {
-  padding: 30px;
-  padding-top: 10px;
+  padding: 2px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  width: 360px;
+  width: 330px;
+  min-width: 330px;
   height: 450px;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  background-color: #e6e6e6;
+  border: 1px solid rgb(150, 150, 150);
 }
-
 h1 {
-    padding-top: 5px;
+  margin-top: 30px;
 }
 .display {
-  width: 300px;
-  height: 50px;
+  margin-top: 50px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
 }
 .display input {
-  width: 300px;
-  height: 50px;
-  text-align:right; 
+  width: 325px;
+  height: 60px;
+  text-align: right;
   padding: 10px;
-  font-size: 1rem;
+  font-size: 2.5rem;
   font-family: inherit;
+  background-color: #e6e6e6;
+  border: none;
 }
-/* .button-container {
-    
-} */
-
+.button-container {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 button {
   margin: 1px;
-  margin-bottom: 5px;
-  width: 70px;
+  width: 80px;
   height: 50px;
   font-family: inherit;
+  font-size: 1rem;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  transition: 0.3s;
 }
-
-
+.operator,
+.eraser,
+.clear {
+  background-color: #f0f0f0;
+  font-weight: lighter;
+}
+.operator {
+  font-size: 1.5rem;
+}
+.equal {
+  background-color: #c78ac0;
+  font-size: 2rem;
+  font-weight: lighter;
+  color: #44474b;
+}
+.number {
+font-weight: bold;
+}
+button:hover {
+  background-color: #d1d1d1;
+}
+.equal:hover {
+  background-color: #b045a4;
+  color: #000000;
+}
+/********** to use in js **********/
+.button-keydown {
+  background-color: #d1d1d1;
+}
+.equal-keydown {
+  background-color: #b045a4;
+  color: #000000;
+}
+/********************************/
 footer {
   margin-top: auto;
-  background-color: rgb(156 151 141 / 37%);
+  background-color: #c78ac0;
   align-self: stretch;
   display: flex;
   justify-content: center;
-  box-shadow: 1px 1px 10px 3px rgba(172, 169, 155, 0.7);
+  box-shadow: 1px 1px 5px 3px #b045a4;
 }
-
 footer p {
   padding: 20px;
-  
 }
